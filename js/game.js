@@ -6,6 +6,9 @@ let platforms;
 let lastPointer;
 let running = false;
 let matrix = [];
+let items;
+let score = 0;
+let scoreString;
 
 // Configuracion del juego
 let config = {
@@ -68,6 +71,8 @@ function preload () {
     
     this.load.image('longBrownPlatform', 'assets/ground/long brown platform.png');
 
+    this.load.image('bananas', 'assets/items/Bananas.png');
+
     //Cargar sprite de piso aleatoriamente
     switch (Math.floor(Math.random() * 3) + 1) {
         case 1:
@@ -113,6 +118,8 @@ function create () {
     platforms.create(638, 400, 'ground');
     platforms.create(682, 400, 'ground');
     
+    // Formula utilizada para generar el valor minimo y maximmo -> Math.floor(Math.random() * (max - min + 1)) + min
+
     randomPlatforms();
     // Generación usando la matriz
     for(let i=0; i<5; i++) {
@@ -210,23 +217,15 @@ function create () {
         }
     }
 
-    //Creacion plataformas superiores
-    /*platforms.create(452, 300, 'longBrownPlatform');
-    platforms.create(500, 300, 'longBrownPlatform');
-    platforms.create(250, 230, 'longBrownPlatform');
-    platforms.create(400, 160, 'longBrownPlatform');
-    platforms.create(350, 90, 'longBrownPlatform');
-    platforms.create(300, 50, 'longBrownPlatform');
-    platforms.create(69, 50, 'longBrownPlatform');*/
-
     // Generacion de plataformas, Altura maxima: 50, Altura minima: 300, Diferencia maxima: 70, Distancia maxima entre plataformas: 250, Bordes: 40
 
 
-    player = this.physics.add.sprite(50, 180, 'player');
+    player = this.physics.add.sprite(50, 350, 'player');
     player.setCollideWorldBounds(true);
 
     //Creacion de animaciones
 
+    // Animaciones de jugador
     this.anims.create({
         key: 'idle',
         frames: this.anims.generateFrameNumbers('player', { start: 0, end: 10 }),
@@ -260,14 +259,23 @@ function create () {
         frameRate: 1
     });
 
+    items = this.physics.add.group({
+        key: 'bananas',
+        repeat: 4,
+        setXY: { x: 45, y: 0, stepX: Math.floor(Math.random() * (120 + 1)) + 40 }
+    });
+
+    scoreString = this.add.text(16, 16, 'Marcador: 0', { fontSize: '16px', fill: '#000' });
+
     // Collider del personaje con las plataformas
     this.physics.add.collider(player, platforms);
+    this.physics.add.collider(items, platforms);
+
+    this.physics.add.overlap(player, items, collectItems, null, this);
 }
 
 function update () {
     this.input.on('pointerdown', function (pointer) {
-        
-
         if(player.body.touching.down){
             player.anims.play('jump', true);
             player.setVelocityY(-230);
@@ -315,7 +323,6 @@ function update () {
     if (player.body.touching.down && !running) {
         player.anims.play('idle', true);
     }
-    
 }
 
 // Algoritmo para generacion aleatoria
@@ -348,4 +355,10 @@ function randomPlatforms() {
     }
 }
 
+// Funcion en caso de que se colecte un item
+function collectItems(player, items) {
+    items.disableBody(true, true);
 
+    score += 5;
+    scoreString.setText('Marcador: ' + score);
+}
