@@ -195,6 +195,7 @@ function create () {
                             }
                         break;
                     case 3:
+                            // Necesita la variable trophyX para saber donde aparecer la copa
                             switch (j) {
                                 case 0:
                                         trophyX = Math.floor(Math.random() * 122 + 1) + 69;
@@ -328,7 +329,6 @@ function update () {
             }
             player.setVelocityX(160)
         }
-        
     });
 
     // Revisa si estan cerca el valor X del puntero y del personaje para detenerlo 
@@ -349,7 +349,6 @@ function update () {
     else if(player.body.touching.down) {
         player.anims.play('runLeft', true);
     }
-
 
     // Revisa si el personaje toca el suelo y no se mueve activa animacion de idle
     if (player.body.touching.down && !running) {
@@ -372,12 +371,12 @@ function randomPlatforms() {
     // Generacion aleatoria
     for(let i=0; i<4; i++) {
         
-        
-
         // Generacion de plataformas en eje X
         let r1 = Math.floor(Math.random() * 3);
         let r2 = Math.floor(Math.random() * 3);
         
+        // En caso de que el anterior terminara con 00 o 11, se agregara uno en medio para
+        // intentar evitar niveles imposibles
         if (!solvable) {
             r1 = 1;
             solvable = true;
@@ -404,6 +403,7 @@ function collectItems(player, items) {
     scoreString.setText('Marcador: ' + score);
 }
 
+// Funcion para recolectar trofeos y cambiar de nivel
 function collectTrophy(player, trophy) {
     trophy.disableBody(true, true);
 
@@ -418,7 +418,7 @@ function collectTrophy(player, trophy) {
 function hitTramp (player, trampas){
     player.setTint(0xff0000);
 
-    scoreString.setText('Perdiste :c');
+    scoreString.setText('Perdiste\nPuntaje final: ' + score);
     gameOver = true;
     this.scene.pause();
 }
