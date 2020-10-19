@@ -14,6 +14,10 @@ let trophyX;
 let trampas;
 let gameOver = false;
 let solvable = true;
+let enemies;
+let level = 0;
+let difficulty = 0;
+let doubleJump = true;
 
 // Configuracion del juego
 let config = {
@@ -71,6 +75,7 @@ function preload () {
     this.load.spritesheet('player', 'assets/player/Idle (32x32).png', { frameWidth: 32, frameHeight: 32});
     this.load.spritesheet('playerRunRight', 'assets/player/Run (32x32).png', { frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet('playerRunLeft', 'assets/player/RunLeft (32x32).png', { frameWidth: 32, frameHeight: 32 });
+    this.load.spritesheet('playerDouble', 'assets/player/Double Jump (32x32).png', { frameWidth: 32, frameHeight: 32 });
     this.load.image('playerJump', 'assets/player/Jump (32x32).png');
     this.load.image('playerFalling', 'assets/player/Fall (32x32).png');
     
@@ -85,6 +90,9 @@ function preload () {
 
     // Cargar trampas
     this.load.image('picos', 'assets/traps/Idle.png');
+
+    // Cargar enemigo
+    this.load.image('enemy', 'assets/enemy/turtle.png');
 
     //Cargar sprite de piso aleatoriamente
     switch (Math.floor(Math.random() * 3) + 1) {
@@ -224,7 +232,6 @@ function create () {
 
     // Generacion de plataformas, Altura maxima: 50, Altura minima: 300, Diferencia maxima: 70, Distancia maxima entre plataformas: 250, Bordes: 40
 
-
     player = this.physics.add.sprite(20, 360, 'player');
     player.setCollideWorldBounds(true);
 
@@ -253,6 +260,13 @@ function create () {
     });
 
     this.anims.create({
+        key: 'doubleJump',
+        frames: this.anims.generateFrameNumbers('playerDouble', { start: 0, end: 5 }),
+        frameRate: 20,
+        repeat: -1
+    });
+
+    this.anims.create({
         key: 'jump',
         frames: [ { key: 'playerJump', frame: 0 } ],
         frameRate: 1
@@ -268,8 +282,8 @@ function create () {
 
     items = this.physics.add.group({
         key: 'bananas',
-        repeat: 4,
-        setXY: { x: 45, y: 0, stepX: Math.floor(Math.random() * (120 + 1)) + 40 }
+        repeat: difficulty,
+        setXY: { x: 45, y: 0, stepX: Math.floor(Math.random() * (120 + 1)) + 100 }
     });
 
     trophy = this.physics.add.group({
@@ -280,21 +294,25 @@ function create () {
     trampas = this.physics.add.group({
         key: 'picos',
         repeat: 2,
-        setXY: { x: 150, y: 360, stepX: Math.floor(Math.random() * (120 + 1)) + 100 }
+        setXY: { x: 150, y: 360, stepX: Math.floor(Math.random() * (20 + 1)) + 100 }
     });
 
-    scoreString = this.add.text(16, 16, 'Marcador: ' + score, { fontSize: '16px', fill: '#000' });
+    scoreString = this.add.text(16, 16, 'Marcador: ' + score + '\nNivel: ' + (level + 1), { fontSize: '16px', fill: '#000' });
+
+    enemies = this.physics.add.group();
 
     // Collider del personaje con las plataformas
     this.physics.add.collider(player, platforms);
     this.physics.add.collider(items, platforms);
     this.physics.add.collider(trophy, platforms);
     this.physics.add.collider(trampas, platforms);
+    this.physics.add.collider(enemies, platforms);
 
     this.physics.add.overlap(player, items, collectItems, null, this);
     this.physics.add.overlap(player, trophy, collectTrophy, null, this);
 
     this.physics.add.collider(player, trampas, hitTramp, null, this);
+    this.physics.add.collider(player, enemies, hitTramp, null, this);
 }
 
 function update () {
@@ -307,8 +325,11 @@ function update () {
             player.anims.play('jump', true);
             player.setVelocityY(-230);
         }
-
-
+        else if (doubleJump) { // Agregar doble salto
+            player.anims.play('doubleJump', true);
+            player.setVelocityY(-230);
+            doubleJump = false;
+        }
     }, this);
     
     // Detecta movimiento del cursor dentro del canvas para mover el player
@@ -401,6 +422,35 @@ function collectItems(player, items) {
 
     score += 5;
     scoreString.setText('Marcador: ' + score);
+
+    if (level < 5) {
+        let enemy = enemies.create(550, 380, 'enemy');
+        enemy.setCollideWorldBounds(true);
+        enemy.setVelocity(Phaser.Math.Between(20, 70)); 
+        enemy.setBounce(1, 0);
+    }
+    else if ( level < 9 ){
+        let enemy = enemies.create(550, 380, 'enemy');
+        enemy.setCollideWorldBounds(true);
+        enemy.setVelocity(Phaser.Math.Between(70, 100)); 
+        enemy.setBounce(1, 0);
+        console.log('nivel<9');
+    }
+    else if( level < 14 ){
+        let enemy = enemies.create(550, 380, 'enemy');
+        enemy.setCollideWorldBounds(true);
+        enemy.setVelocity(Phaser.Math.Between(100, 200)); 
+        enemy.setBounce(1, 0);
+        console.log('nivel<14');
+    }
+    else if( level > 14 ){
+        let enemy = enemies.create(Math.floor(Math.random() * (300 + 1)) + 150, 200, 'enemy');
+        enemy.setCollideWorldBounds(true);
+        enemy.setVelocity(Phaser.Math.Between(150, 250)); 
+        enemy.setBounce(1, 0);
+    }
+
+    
 }
 
 // Funcion para recolectar trofeos y cambiar de nivel
@@ -408,7 +458,15 @@ function collectTrophy(player, trophy) {
     trophy.disableBody(true, true);
 
     score += 20;
-    scoreString.setText('Marcador: ' + score);
+    scoreString.setText('Marcador: ' + score + '\nNivel: ' + (level + 1));
+
+    if (difficulty < 4) {
+        difficulty += 1;
+    }
+    level += 1;
+
+    doubleJump = true;
+
     this.registry.destroy();
     this.events.off();
     this.scene.restart();
@@ -418,7 +476,7 @@ function collectTrophy(player, trophy) {
 function hitTramp (player, trampas){
     player.setTint(0xff0000);
 
-    scoreString.setText('Perdiste\nPuntaje final: ' + score);
+    scoreString.setText('Perdiste\nPuntaje final: ' + score + '\nNivel maximo: ' + (level + 1 ));
     gameOver = true;
     this.scene.pause();
 }
