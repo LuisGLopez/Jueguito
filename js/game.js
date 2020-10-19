@@ -11,7 +11,8 @@ let score = 0;
 let scoreString;
 let trophy;
 let trophyX;
-
+let trampas;
+let gameOver = false;
 // Configuracion del juego
 let config = {
     type: Phaser.AUTO,
@@ -77,7 +78,10 @@ function preload () {
     this.load.image('bananas', 'assets/items/Bananas.png');
 
     this.load.image('copa', 'assets/items/End.png');
-    
+
+    // Cargar trampas
+    this.load.image('picos', 'assets/traps/Idle.png');
+
     //Cargar sprite de piso aleatoriamente
     switch (Math.floor(Math.random() * 3) + 1) {
         case 1:
@@ -122,7 +126,7 @@ function create () {
     platforms.create(594, 400, 'ground');
     platforms.create(638, 400, 'ground');
     platforms.create(682, 400, 'ground');
-    
+
     // Formula utilizada para generar el valor minimo y maximmo -> Math.floor(Math.random() * (max - min + 1)) + min
 
     randomPlatforms();
@@ -228,7 +232,7 @@ function create () {
     // Generacion de plataformas, Altura maxima: 50, Altura minima: 300, Diferencia maxima: 70, Distancia maxima entre plataformas: 250, Bordes: 40
 
 
-    player = this.physics.add.sprite(50, 350, 'player');
+    player = this.physics.add.sprite(20, 350, 'player');
     player.setCollideWorldBounds(true);
 
     //Creacion de animaciones
@@ -280,18 +284,31 @@ function create () {
         setXY: { x: trophyX, y: 50}
     });
 
+    trampas = this.physics.add.group({
+        key: 'picos',
+        repeat: 2,
+        setXY: { x: 150, y: 360, stepX: Math.floor(Math.random() * (120 + 1)) + 40 }
+    });
+
     scoreString = this.add.text(16, 16, 'Marcador: ' + score, { fontSize: '16px', fill: '#000' });
 
     // Collider del personaje con las plataformas
     this.physics.add.collider(player, platforms);
     this.physics.add.collider(items, platforms);
     this.physics.add.collider(trophy, platforms);
+    this.physics.add.collider(trampas, platforms);
 
     this.physics.add.overlap(player, items, collectItems, null, this);
     this.physics.add.overlap(player, trophy, collectTrophy, null, this);
+
+    this.physics.add.collider(player, trampas, hitTramp, null, this);
 }
 
 function update () {
+    if(gameOver){
+        return;
+    }
+
     this.input.on('pointerdown', function (pointer) {
         if(player.body.touching.down){
             player.anims.play('jump', true);
@@ -388,4 +405,16 @@ function collectTrophy(player, trophy) {
     this.registry.destroy();
     this.events.off();
     this.scene.restart();
+}
+
+function hitTramp (player, trampas){
+    this.physics.pause();
+
+    player.setTint(0xff0000);
+
+    //player.anims.pause(player.anims.currentAnim.frames[2]);
+
+    scoreString.setText('Perdiste :c');
+    gameOver = true;
+    this.scene.pause();
 }
