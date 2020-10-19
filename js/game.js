@@ -75,7 +75,7 @@ function preload () {
 
     // Carga de items
     this.load.image('bananas', 'assets/items/Bananas.png');
-    this.load.image('copa', 'assets/items/End(idle).png');
+    this.load.image('copa', 'assets/items/End (idle).png');
     
     //Cargar sprite de piso aleatoriamente
     switch (Math.floor(Math.random() * 3) + 1) {
