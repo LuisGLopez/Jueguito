@@ -421,7 +421,7 @@ function collectItems(player, items) {
     items.disableBody(true, true);
 
     score += 5;
-    scoreString.setText('Marcador: ' + score);
+    scoreString.setText('Marcador: ' + score + '\nNivel: ' + (level + 1));
 
     if (level < 5) {
         let enemy = enemies.create(550, 380, 'enemy');
