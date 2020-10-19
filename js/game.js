@@ -9,6 +9,8 @@ let matrix = [];
 let items;
 let score = 0;
 let scoreString;
+let trophy;
+let trophyX;
 
 // Configuracion del juego
 let config = {
@@ -71,8 +73,10 @@ function preload () {
     
     this.load.image('longBrownPlatform', 'assets/ground/long brown platform.png');
 
+    // Carga de items
     this.load.image('bananas', 'assets/items/Bananas.png');
-
+    this.load.image('copa', 'assets/items/End(idle).png');
+    
     //Cargar sprite de piso aleatoriamente
     switch (Math.floor(Math.random() * 3) + 1) {
         case 1:
@@ -180,13 +184,16 @@ function create () {
                     case 3:
                             switch (j) {
                                 case 0:
-                                        platforms.create(Math.floor(Math.random() * 122 + 1) + 69, 90, 'longBrownPlatform');
+                                        trophyX = Math.floor(Math.random() * 122 + 1) + 69;
+                                        platforms.create(trophyX, 90, 'longBrownPlatform');
                                     break;
                                 case 1:
-                                        platforms.create(Math.floor(Math.random() * 77 + 1) + 239, 90, 'longBrownPlatform');
+                                        trophyX = Math.floor(Math.random() * 77 + 1) + 239;
+                                        platforms.create(trophyX, 90, 'longBrownPlatform');
                                     break;
                                 case 2:
-                                        platforms.create(Math.floor(Math.random() * 122 + 1) + 409, 90, 'longBrownPlatform');
+                                        trophyX = Math.floor(Math.random() * 122 + 1) + 409;
+                                        platforms.create(trophyX, 90, 'longBrownPlatform');
                                     break;
                                 default:
                                         alert('Error al generar el mundo, favor de recargar el sitio');
@@ -199,7 +206,7 @@ function create () {
                                         platforms.create(Math.floor(Math.random() * 122 + 1) + 69, 40, 'longBrownPlatform');
                                     break;
                                 case 1:
-                                        platforms.create(Math.floor(Math.random() * 77 + 1) + 239, 40, 'longBrownPlatform');
+                                        platforms.create( Math.floor(Math.random() * 77 + 1) + 239, 40, 'longBrownPlatform');
                                     break;
                                 case 2:
                                         platforms.create(Math.floor(Math.random() * 122 + 1) + 409, 40, 'longBrownPlatform');
@@ -259,19 +266,28 @@ function create () {
         frameRate: 1
     });
 
+    // Colocar items
+
     items = this.physics.add.group({
         key: 'bananas',
         repeat: 4,
         setXY: { x: 45, y: 0, stepX: Math.floor(Math.random() * (120 + 1)) + 40 }
     });
 
-    scoreString = this.add.text(16, 16, 'Marcador: 0', { fontSize: '16px', fill: '#000' });
+    trophy = this.physics.add.group({
+        key: 'copa',
+        setXY: { x: trophyX, y: 50}
+    });
+
+    scoreString = this.add.text(16, 16, 'Marcador: ' + score, { fontSize: '16px', fill: '#000' });
 
     // Collider del personaje con las plataformas
     this.physics.add.collider(player, platforms);
     this.physics.add.collider(items, platforms);
+    this.physics.add.collider(trophy, platforms);
 
     this.physics.add.overlap(player, items, collectItems, null, this);
+    this.physics.add.overlap(player, trophy, collectTrophy, null, this);
 }
 
 function update () {
@@ -361,4 +377,14 @@ function collectItems(player, items) {
 
     score += 5;
     scoreString.setText('Marcador: ' + score);
+}
+
+function collectTrophy(player, trophy) {
+    trophy.disableBody(true, true);
+
+    score += 20;
+    scoreString.setText('Marcador: ' + score);
+    this.registry.destroy();
+    this.events.off();
+    this.scene.restart();
 }
