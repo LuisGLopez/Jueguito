@@ -13,11 +13,13 @@ let trophy;
 let trophyX;
 let trampas;
 let gameOver = false;
+let solvable = true;
+
 // Configuracion del juego
 let config = {
     type: Phaser.AUTO,
     width:  600,
-    height: 400,
+    height: 412,
     scene: gameScene,
     physics: {
         default: 'arcade',
@@ -74,6 +76,8 @@ function preload () {
     
     this.load.image('longBrownPlatform', 'assets/ground/long brown platform.png');
 
+    this.load.image('platformStart', 'assets/ground/brown platform start.png');
+
     // Carga de items
     this.load.image('bananas', 'assets/items/Bananas.png');
 
@@ -109,29 +113,33 @@ function create () {
     bg.setPosition(gameW/2, gameH/2);
     
     platforms = this.physics.add.staticGroup();
+
+    // Plataforma para evitar muertes accidentales
+    platforms.create(70, 380, 'platformStart');
+    
     // Creacion de la base principal 
-    platforms.create(22, 400, 'ground');
-    platforms.create(66, 400, 'ground');
-    platforms.create(110, 400, 'ground');
-    platforms.create(154, 400, 'ground');
-    platforms.create(198, 400, 'ground');
-    platforms.create(242, 400, 'ground');
-    platforms.create(286, 400, 'ground');
-    platforms.create(330, 400, 'ground');
-    platforms.create(374, 400, 'ground');
-    platforms.create(418, 400, 'ground');
-    platforms.create(462, 400, 'ground');
-    platforms.create(506, 400, 'ground');
-    platforms.create(550, 400, 'ground');
-    platforms.create(594, 400, 'ground');
-    platforms.create(638, 400, 'ground');
-    platforms.create(682, 400, 'ground');
+    platforms.create(22, 412, 'ground');
+    platforms.create(66, 412, 'ground');
+    platforms.create(110, 412, 'ground');
+    platforms.create(154, 412, 'ground');
+    platforms.create(198, 412, 'ground');
+    platforms.create(242, 412, 'ground');
+    platforms.create(286, 412, 'ground');
+    platforms.create(330, 412, 'ground');
+    platforms.create(374, 412, 'ground');
+    platforms.create(418, 412, 'ground');
+    platforms.create(462, 412, 'ground');
+    platforms.create(506, 412, 'ground');
+    platforms.create(550, 412, 'ground');
+    platforms.create(594, 412, 'ground');
+    platforms.create(638, 412, 'ground');
+    platforms.create(682, 412, 'ground'); 
 
     // Formula utilizada para generar el valor minimo y maximmo -> Math.floor(Math.random() * (max - min + 1)) + min
 
     randomPlatforms();
     // Generación usando la matriz
-    for(let i=0; i<5; i++) {
+    for(let i=0; i<4; i++) {
         for(let j=0; j<3; j++) {
             if ( matrix[i][j] === 1){
                 // Switch para generacion segun el nivel del eje X
@@ -141,13 +149,13 @@ function create () {
                             // Cada caso cuenta con un funcion random para generar un valor nuevo dentro del rango permitido
                             switch (j) {
                                 case 0:
-                                        platforms.create(Math.floor(Math.random() * 122 + 1) + 69, 300, 'longBrownPlatform');
+                                        platforms.create(Math.floor(Math.random() * 122 + 1) + 69, 310, 'longBrownPlatform');
                                     break;
                                 case 1:
-                                        platforms.create(Math.floor(Math.random() * 77 + 1) + 239, 300, 'longBrownPlatform');
+                                        platforms.create(Math.floor(Math.random() * 77 + 1) + 239, 310, 'longBrownPlatform');
                                     break;
                                 case 2:
-                                        platforms.create(Math.floor(Math.random() * 122 + 1) + 409, 300, 'longBrownPlatform');
+                                        platforms.create(Math.floor(Math.random() * 122 + 1) + 409, 310, 'longBrownPlatform');
                                     break;
                                 default:
                                         alert('Error al generar el mundo, favor de recargar el sitio');
@@ -157,13 +165,13 @@ function create () {
                     case 1: 
                             switch (j) {
                                 case 0:
-                                        platforms.create(Math.floor(Math.random() * 122 + 1) + 69, 230, 'longBrownPlatform');
+                                        platforms.create(Math.floor(Math.random() * 122 + 1) + 69, 242, 'longBrownPlatform');
                                     break;
                                 case 1:
-                                        platforms.create(Math.floor(Math.random() * 77 + 1) + 239, 230, 'longBrownPlatform');
+                                        platforms.create(Math.floor(Math.random() * 77 + 1) + 239, 242, 'longBrownPlatform');
                                     break;
                                 case 2:
-                                        platforms.create(Math.floor(Math.random() * 122 + 1) + 409, 230, 'longBrownPlatform');
+                                        platforms.create(Math.floor(Math.random() * 122 + 1) + 409, 242, 'longBrownPlatform');
                                     break;
                                 default:
                                         alert('Error al generar el mundo, favor de recargar el sitio');
@@ -173,13 +181,13 @@ function create () {
                     case 2:
                             switch (j) {
                                 case 0:
-                                        platforms.create(Math.floor(Math.random() * 122 + 1) + 69, 160, 'longBrownPlatform');
+                                        platforms.create(Math.floor(Math.random() * 122 + 1) + 69, 172, 'longBrownPlatform');
                                     break;
                                 case 1:
-                                        platforms.create(Math.floor(Math.random() * 77 + 1) + 239, 160, 'longBrownPlatform');
+                                        platforms.create(Math.floor(Math.random() * 77 + 1) + 239, 172, 'longBrownPlatform');
                                     break;
                                 case 2:
-                                        platforms.create(Math.floor(Math.random() * 122 + 1) + 409, 160, 'longBrownPlatform');
+                                        platforms.create(Math.floor(Math.random() * 122 + 1) + 409, 172, 'longBrownPlatform');
                                     break;
                                 default:
                                         alert('Error al generar el mundo, favor de recargar el sitio');
@@ -190,36 +198,20 @@ function create () {
                             switch (j) {
                                 case 0:
                                         trophyX = Math.floor(Math.random() * 122 + 1) + 69;
-                                        platforms.create(trophyX, 90, 'longBrownPlatform');
+                                        platforms.create(trophyX, 102, 'longBrownPlatform');
                                     break;
                                 case 1:
                                         trophyX = Math.floor(Math.random() * 77 + 1) + 239;
-                                        platforms.create(trophyX, 90, 'longBrownPlatform');
+                                        platforms.create(trophyX, 102, 'longBrownPlatform');
                                     break;
                                 case 2:
                                         trophyX = Math.floor(Math.random() * 122 + 1) + 409;
-                                        platforms.create(trophyX, 90, 'longBrownPlatform');
+                                        platforms.create(trophyX, 102, 'longBrownPlatform');
                                     break;
                                 default:
                                         alert('Error al generar el mundo, favor de recargar el sitio');
                                     break;
                             }   
-                        break;
-                    case 4:
-                            switch (j) {
-                                case 0:
-                                        platforms.create(Math.floor(Math.random() * 122 + 1) + 69, 40, 'longBrownPlatform');
-                                    break;
-                                case 1:
-                                        platforms.create( Math.floor(Math.random() * 77 + 1) + 239, 40, 'longBrownPlatform');
-                                    break;
-                                case 2:
-                                        platforms.create(Math.floor(Math.random() * 122 + 1) + 409, 40, 'longBrownPlatform');
-                                    break;
-                                default:
-                                        alert('Error al generar el mundo, favor de recargar el sitio');
-                                    break;
-                            }
                         break;
                     default:
                             alert('Error al generar el mundo, favor de recargar el sitio');
@@ -232,7 +224,7 @@ function create () {
     // Generacion de plataformas, Altura maxima: 50, Altura minima: 300, Diferencia maxima: 70, Distancia maxima entre plataformas: 250, Bordes: 40
 
 
-    player = this.physics.add.sprite(20, 350, 'player');
+    player = this.physics.add.sprite(20, 360, 'player');
     player.setCollideWorldBounds(true);
 
     //Creacion de animaciones
@@ -287,7 +279,7 @@ function create () {
     trampas = this.physics.add.group({
         key: 'picos',
         repeat: 2,
-        setXY: { x: 150, y: 360, stepX: Math.floor(Math.random() * (120 + 1)) + 40 }
+        setXY: { x: 150, y: 360, stepX: Math.floor(Math.random() * (120 + 1)) + 100 }
     });
 
     scoreString = this.add.text(16, 16, 'Marcador: ' + score, { fontSize: '16px', fill: '#000' });
@@ -323,11 +315,17 @@ function update () {
         lastPointer = pointer.x;
         running = true;
         if (player.x > Math.floor(pointer.x)) {
-            player.anims.play('runLeft', true);
+            // Fix para evitar correr en el aire
+            if(player.body.touching.down){
+                player.anims.play('runLeft', true);
+            }
             player.setVelocityX(-160);
         }
         else {
-            player.anims.play('runRight', true);
+            // Fix para evitar correr en el aire
+            if(player.body.touching.down){
+                player.anims.play('runRight', true);
+            }
             player.setVelocityX(160)
         }
         
@@ -363,7 +361,7 @@ function update () {
 
 function randomPlatforms() {
     // Inicializacion de matriz que simula el tablero de 5x3
-    for(let i=0; i<5; i++) {
+    for(let i=0; i<4; i++) {
         matrix[i] = [];
         for(let j=0; j<3; j++) {
             matrix[i][j] = 0;
@@ -372,15 +370,24 @@ function randomPlatforms() {
 
     
     // Generacion aleatoria
-    for(let i=0; i<5; i++) {
+    for(let i=0; i<4; i++) {
         
+        
+
         // Generacion de plataformas en eje X
         let r1 = Math.floor(Math.random() * 3);
         let r2 = Math.floor(Math.random() * 3);
         
+        if (!solvable) {
+            r1 = 1;
+            solvable = true;
+        }
         // En caso de coincidir los numeros aleatorios, solo se generará una plataforma
         if(r1 === r2){
             matrix[i][r1] = 1;
+            if(r1 === 0 || r1 === 2){
+                solvable = false;
+            }
         }
         else { // En caso de ser valores diferentes generara dos plataformas en ese eje X
             matrix[i][r1] = 1;
@@ -407,12 +414,9 @@ function collectTrophy(player, trophy) {
     this.scene.restart();
 }
 
+// Funcion que termina el juego al tocar un trampa
 function hitTramp (player, trampas){
-    this.physics.pause();
-
     player.setTint(0xff0000);
-
-    //player.anims.pause(player.anims.currentAnim.frames[2]);
 
     scoreString.setText('Perdiste :c');
     gameOver = true;
