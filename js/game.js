@@ -9,6 +9,7 @@ let matrix = [];
 let items;
 let score = 0;
 let scoreString;
+let endGameString;
 let trophy;
 let trophyX;
 let trampas;
@@ -297,7 +298,14 @@ function create () {
         setXY: { x: 150, y: 360, stepX: Math.floor(Math.random() * (20 + 1)) + 100 }
     });
 
+    // Declaracion de textos que apareceran
+
     scoreString = this.add.text(16, 16, 'Marcador: ' + score + '\nNivel: ' + (level + 1), { fontSize: '16px', fill: '#000' });
+    scoreString.setTintFill(0xff00ff, 0xff00ff, 0x0000ff, 0x0000ff);
+    
+    endGameString = this.add.text((gameW/2)-100, (gameH/2)-50, 'Marcador: ' + score + '\nNivel: ' + (level + 1), { fontSize: '24px', fill: '#000' });
+    endGameString.setTintFill(0xff00ff, 0xff00ff, 0x0000ff, 0x0000ff);
+    endGameString.visible = false;
 
     enemies = this.physics.add.group();
 
