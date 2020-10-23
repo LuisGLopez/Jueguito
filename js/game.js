@@ -13,7 +13,6 @@ let endGameString;
 let trophy;
 let trophyX;
 let trampas;
-let gameOver = false;
 let solvable = true;
 let enemies;
 let level = 0;
@@ -324,10 +323,6 @@ function create () {
 }
 
 function update () {
-    if(gameOver){
-        return;
-    }
-
     this.input.on('pointerdown', function (pointer) {
         if(player.body.touching.down){
             player.anims.play('jump', true);
@@ -442,14 +437,12 @@ function collectItems(player, items) {
         enemy.setCollideWorldBounds(true);
         enemy.setVelocity(Phaser.Math.Between(70, 100)); 
         enemy.setBounce(1, 0);
-        console.log('nivel<9');
     }
-    else if( level < 14 ){
+    else if( level <= 14 ){
         let enemy = enemies.create(550, 380, 'enemy');
         enemy.setCollideWorldBounds(true);
         enemy.setVelocity(Phaser.Math.Between(100, 200)); 
         enemy.setBounce(1, 0);
-        console.log('nivel<14');
     }
     else if( level > 14 ){
         let enemy = enemies.create(Math.floor(Math.random() * (300 + 1)) + 150, 200, 'enemy');
@@ -485,6 +478,5 @@ function hitTramp (player, trampas){
     player.setTint(0xff0000);
 
     scoreString.setText('Perdiste\nPuntaje final: ' + score + '\nNivel maximo: ' + (level + 1 ));
-    gameOver = true;
     this.scene.pause();
 }
