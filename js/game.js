@@ -9,7 +9,6 @@ let matrix = [];
 let items;
 let score = 0;
 let scoreString;
-let endGameString;
 let trophy;
 let trophyX;
 let trampas;
@@ -17,6 +16,10 @@ let solvable = true;
 let enemies;
 let level = 0;
 let difficulty = 0;
+let lastScore = 0;
+let bestScore = 0;
+let lastScoreString;
+let bestScoreString;
 let doubleJump = true;
 
 // Configuracion del juego
@@ -301,10 +304,12 @@ function create () {
 
     scoreString = this.add.text(16, 16, 'Marcador: ' + score + '\nNivel: ' + (level + 1), { fontSize: '16px', fill: '#000' });
     scoreString.setTintFill(0xff00ff, 0xff00ff, 0x0000ff, 0x0000ff);
-    
-    endGameString = this.add.text((gameW/2)-100, (gameH/2)-50, 'Marcador: ' + score + '\nNivel: ' + (level + 1), { fontSize: '24px', fill: '#000' });
-    endGameString.setTintFill(0xff00ff, 0xff00ff, 0x0000ff, 0x0000ff);
-    endGameString.visible = false;
+
+    lastScoreString = this.add.text(gameW-150, 32, 'Ultimo puntaje: ' + lastScore, { fontSize: '12px', fill: '#000' });
+    lastScoreString.setTintFill(0xff00ff, 0xff00ff, 0x0000ff, 0x0000ff);
+
+    bestScoreString = this.add.text(gameW-150, 16, 'Mejor puntaje: ' + bestScore, { fontSize: '12px', fill: '#000' });
+    bestScoreString.setTintFill(0xff00ff, 0xff00ff, 0x0000ff, 0x0000ff);
 
     enemies = this.physics.add.group();
 
@@ -391,7 +396,6 @@ function randomPlatforms() {
         }
     }
 
-    
     // Generacion aleatoria
     for(let i=0; i<4; i++) {
         
@@ -450,8 +454,6 @@ function collectItems(player, items) {
         enemy.setVelocity(Phaser.Math.Between(150, 250)); 
         enemy.setBounce(1, 0);
     }
-
-    
 }
 
 // Funcion para recolectar trofeos y cambiar de nivel
@@ -475,8 +477,25 @@ function collectTrophy(player, trophy) {
 
 // Funcion que termina el juego al tocar un trampa
 function hitTramp (player, trampas){
+    // Cambiar color del personaje al perder
     player.setTint(0xff0000);
 
-    scoreString.setText('Perdiste\nPuntaje final: ' + score + '\nNivel maximo: ' + (level + 1 ));
-    this.scene.pause();
+    // Revisar el puntaje mas alto
+    if(bestScore < lastScoreString){
+        bestScore = lastScore;
+    }
+    else if (bestScore < score) {
+        bestScore = score;
+    }
+
+    lastScore = score;
+
+    level = 0;
+    score = 0;
+    difficulty = 0;
+
+    // this.scene.pause();
+    this.registry.destroy();
+    this.events.off();
+    this.scene.restart();
 }
